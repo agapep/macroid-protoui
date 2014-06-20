@@ -5,9 +5,9 @@ import android.view.View
 import macroid.{Tweak, ActivityContext}
 import android.widget.{TextView, ListView}
 import macroid.FullDsl._
-import macroid.protoui.tweaks.Tweaks._
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.language.implicitConversions
+import macroid.protoui.tweaks._
 
 /**
  * Służy do definiowania widoków dla klasy T.
