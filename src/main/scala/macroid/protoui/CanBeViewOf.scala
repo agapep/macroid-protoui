@@ -30,12 +30,12 @@ abstract class CanBeViewOf2[T, S] {
 object CanBeViewOf {
   implicit def objectCanBeShown = new AutoView[AnyRef](
     implicit t => implicit c =>
-      w[TextView] <~ rv((v:TextView,obj:AnyRef) => v.setText(obj.toString))
+      w[TextView] <~ react((v:TextView,obj:AnyRef) => v.setText(obj.toString))
   )
 
   implicit def arrayCanBeShown[T <: AnyRef](implicit c: ActivityContext, cbs: CanBeViewOf[T]): CanBeViewOf[Array[T]] = new AutoView[Array[T]] (
     implicit t => implicit c =>
-      w[ListView] <~ rv((v: ListView, data:Array[T]) => v.setAdapter(AutoAdapter[T](data)))
+      w[ListView] <~ react((v: ListView, data:Array[T]) => v.setAdapter(AutoAdapter[T](data)))
   )
 }
 
