@@ -48,6 +48,13 @@ object ViewOf {
     new ViewOf2(creator.createView((handler, handler2)), handler, handler2)
   }
 
+  def apply[T, S](obj: T, obj2: S)(implicit creator:CanBeViewOf2[T, S], c: ActivityContext): ViewOf2[T, S] = {
+    val res = ViewOf[T, S]
+    res.value.update(obj)
+    res.value2.update(obj2)
+    res
+  }
+
 
   implicit def toUi[T](s: ViewOf[T]):Ui[View] = s.ui
   implicit def toView[T](s: ViewOf[T]):View = macroid.FullDsl.getUi(s.ui)
