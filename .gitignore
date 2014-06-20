@@ -16,6 +16,26 @@ gen/
 .gradle/
 build/
 
+# generated files (used in sbt layout) 
+target/
+project/target/
+project/project/
+
+# Android Studio
+.idea/
+.idea_modules/
+
+out
+build
+production
+*.iml
+*.iws
+*.ipr
+*.swp
+
+#temporary files
+*~
+
 # Local configuration file (sdk path, etc)
 local.properties
 
