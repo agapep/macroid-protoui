@@ -13,7 +13,7 @@ Aby utworzyć reprezentacje (Ui[View]) np. dla klasy Person należy napisać jed
   val personView:ViewOf[Person] = ViewOf[Person]
 ```
 
-W ten sposób utworzyliśmy instancję klasy ViewOf[Person]. Możemy dostać się do jej widoku (_.ui lub _.view) lub specjalnego handlera (_.value) który pozwala ustawić jaką konkretne instancje klasy person wyświetlać.
+W ten sposób utworzyliśmy instancję klasy ViewOf[Person]. Możemy dostać się do jej widoku (```scala _.ui``` lub _.view) lub specjalnego handlera (_.value) który pozwala ustawić jaką konkretne instancje klasy person wyświetlać.
 
 oczywiście musi istnieć gdzieś instrukcja jak z klasy Person utworzyć View. Gdy spojrzymy na sygnature metody ViewOf[T].apply (użyliśmy jej powyżej) zobaczymy, iż posiada ona jako parametr domniemany, obiekt typu CanBeViewOf[Person]. Ten obiekt jest naszą instrukcją jak utworzyć widok dla klasy Person.  
 
@@ -63,8 +63,9 @@ pozostaje zapytać gdzie mamy je utworzyć?
 ```
 
 wtedy będziesz zmuszony zaimportować je w miejscu użycia ręcznie:
+  ```scala
   import ViewBuilders._
-	
+  ```
 	
 abstract
 -------------------
