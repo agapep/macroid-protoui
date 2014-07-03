@@ -2,7 +2,7 @@ package macroid.protoui
 
 import macroid.util.Ui
 import android.view.View
-import macroid.ActivityContext
+import macroid.{CanTweak, Tweak, ActivityContext}
 import scala.language.implicitConversions
 /**
  * Klasa reprezentuje widok generowany dla typu T który może
@@ -17,24 +17,38 @@ import scala.language.implicitConversions
  * Created by slovic on 14.06.14.
  */
 class ViewOf[T](val ui: Ui[View], val value: AbstractReactiveVarible[T]) {
-  /**
-   * skrót dla value.update
-   */
-  def update(obj: T) = value.update(obj)
+  import macroid.FullDsl._
+  def withTweak[W <: View, R] (t: Tweak[W])
+                            (implicit ct: CanTweak[Ui[View], Tweak[W], View]):
+                            ViewOf[T] = new ViewOf(ui <~ t, value)
+
+  def withTweak[W <: View, R] (f: AbstractReactiveVarible[T] => Tweak[W])
+                              (implicit ct: CanTweak[Ui[View], Tweak[W], View]):
+                              ViewOf[T] = new ViewOf(ui <~ f(value), value)
+
+  def snail:ViewOf[T] = ???
   def view = ui.get
 }
 
-class ViewOf2[T, S](val ui: Ui[View], val value: AbstractReactiveVarible[T],
-                 val value2: AbstractReactiveVarible[S]) {
-  def view = ui.get
-}
+class ViewOf2[T, S](ui: Ui[View], value: AbstractReactiveVarible[T],
+                 val value2: AbstractReactiveVarible[S]) extends ViewOf[T](ui, value)
 
 object ViewOf {
+  //tested
   def apply[T](implicit creator:CanBeViewOf[T], c: ActivityContext): ViewOf[T] = {
     val handler = new ReactiveVarible[T]
     new ViewOf(creator.createView(handler), handler)
   }
 
+  def apply[T](tweaks: Tweak[View]*)
+              (implicit creator:CanBeViewOf[T], c: ActivityContext): ViewOf[T] = {
+    import macroid.FullDsl._
+    val handler = new ReactiveVarible[T]
+    val view = tweaks.foldLeft[Ui[View]](creator.createView(handler))((v:Ui[View],t: Tweak[View]) => v <~ t)
+    new ViewOf(view, handler)
+  }
+
+  //tested
   def apply[T](obj: T)
               (implicit creator:CanBeViewOf[T], c: ActivityContext): ViewOf[T] = {
     val res = ViewOf[T]
@@ -42,12 +56,14 @@ object ViewOf {
     res
   }
 
+  //tested
   def apply[T, S](implicit creator:CanBeViewOf2[T, S], c: ActivityContext): ViewOf2[T, S] = {
     val handler = new ReactiveVarible[T]
     val handler2 = new ReactiveVarible[S]
     new ViewOf2(creator.createView((handler, handler2)), handler, handler2)
   }
 
+  //tested
   def apply[T, S](obj: T, obj2: S)(implicit creator:CanBeViewOf2[T, S], c: ActivityContext): ViewOf2[T, S] = {
     val res = ViewOf[T, S]
     res.value.update(obj)
