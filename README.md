@@ -13,15 +13,19 @@ Aby utworzyć reprezentacje (```Ui[View]```) np. dla klasy ```Person``` należy 
   val personView:ViewOf[Person] = ViewOf[Person]
 ```
 
-W ten sposób utworzyliśmy instancję klasy ViewOf[Person]. Możemy dostać się do jej widoku (```_.ui``` lub ```_.view```) lub specjalnego handlera (```_.value```) który pozwala ustawić jaką konkretne instancje klasy person wyświetlać.
+W ten sposób utworzyliśmy instancję klasy ```ViewOf[Person]```. Możemy dostać się do jej widoku (```_.ui``` lub ```_.view```) lub specjalnego handlera (```_.value```) który pozwala ustawić jaką konkretne instancje klasy person wyświetlać.
 
-oczywiście musi istnieć gdzieś instrukcja jak z klasy ```Person``` utworzyć ```View```. Gdy spojrzymy na sygnature metody ```ViewOf[T].apply``` (użyliśmy jej powyżej) zobaczymy, iż posiada ona jako parametr domniemany, obiekt typu ```CanBeViewOf[Person]```. Ten obiekt jest naszą instrukcją jak utworzyć widok dla klasy ```Person```.  
+oczywiście musimy gdzieś zdefiniować instrukcje, jak z klasy ```Person``` utworzyć jego widok ```View```. Gdy spojrzymy na sygnature metody ```apply``` obiektu ViewOf (metoda ta została wywołana w powyższej lini): 
 
   ```scala
+  object ViewOf[T] { ...
   def apply[T](implicit creator:CanBeViewOf[T], c: ActivityContext):ViewOf[T]
+  ... }
 ```
 
-oznacza to, że aby powyższa linia się skompilowała potrzebujemy dostarczyć ```CanBeViewOf[T]```, co możemy zrobić:
+ zobaczymy, iż posiada ona jako parametr domniemany, obiekt typu ```CanBeViewOf[Person]```. Ten obiekt jest naszą instrukcją jak utworzyć widok dla klasy ```Person```.  
+
+oznacza to, że aby pierwsza linia się skompilowała potrzebujemy dostarczyć obiekt domniemany typu ```CanBeViewOf[T]```. możemy to zrobić:
 - tworząc anonimowy obiekt dziedziczący po ```CanBeViewOf[T]```: 
   
   ```scala
@@ -39,7 +43,7 @@ oznacza to, że aby powyższa linia się skompilowała potrzebujemy dostarczyć 
   ) 
 ```
   
-wytłumaczenia wymaga użyta metoda ```react(...)```. Pomaga ona w wiązani Tweaków z manipulatorami (np pozwala ustawić text widgetu tak by zawsze pokazywał imie osoby, nawet jeśli zmieni się ono w przyszłości). W sumie jest to jedna z najważniejszych właściwości biblioteki. 
+wytłumaczenia wymaga użyta metoda ```react(T => Tweak[W]): Tweak[W]```. Pomaga ona w wiązani Tweaków z manipulatorami (np. pozwala ustawić text widgetu tak, by zawsze pokazywał imie jakiejś osoby, nawet jeśli osoba ta zmieni się w przyszłości). W sumie jest to jedna z najważniejszych właściwości biblioteki. 
 	
 pozostaje zapytać gdzie mamy utworzyć wartość domniemaną ```CanBeViewOf[T]```?
 - najprostszym rozwiązaniem jest utworzenie jej w obiekcie towarzyszącym naszej klasy ```Person```. Jest to rozwiązanie wygodne, gdyż to miejsce będzie przeszukiwane automatycznie (nie trzeba go importować).
@@ -52,7 +56,7 @@ pozostaje zapytać gdzie mamy utworzyć wartość domniemaną ```CanBeViewOf[T]`
   } 
 ```
 
-- w osobnym obiekcie np:
+-można także trzymać wszystkie widoki w osobnym obiekcie:
 
   ```scala
   object ViewBuilders {
@@ -71,13 +75,13 @@ wtedy będziesz zmuszony zaimportować tą zmienną ręcznie w miejscu użycia:
 abstract
 -------------------
 
-Czym dokładnie jest instancja ```ViewOf[T]```? Możemy traktować ją jako połączenie przepisu na widok i specjalnego manipulatora. 
+Czym dokładnie jest instancja ```ViewOf[T]```? Możemy traktować ją jako połączenie przepisu na widok ```Ui[View]``` i specjalnego manipulatora. 
 
 Przepis na widok (```Ui[View]```) -  pozwala nam tworzyć instancje klasy ```View``` (uwaga: możemy stworzyć więcej niż jeden obiekt typu View, korzystając z pojedyńczej instancji ```ViewOf[T]```, ale zazwyczaj nie tego chcesz).
 
 manipulator - pozwala zaaktualizować wszystkie widoki (```View```) stworzone za pomocą ```Ui[View]```. gdy na manipulatorze wywołasz metodę ```update(personObj)``` wszystkie widoki odświerzą się aby poprawnie wyświetlić personObj.
 
-------------------
+
 praca z tablicami
 ------------------
 
@@ -115,7 +119,7 @@ lub
   implicit val `person with style can be auto viewed` = 
     new AutoView2( (personRV, styleRV) => implicit c => ... )
 ```
-------------------
+
 a w przyszłości...
 ------------------
 
