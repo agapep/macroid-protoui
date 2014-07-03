@@ -11,7 +11,7 @@ Aby utworzyć reprezentacje (Ui[View]) np. dla klasy Person należy napisać jed
 
   ```scala
   val personView:ViewOf[Person] = ViewOf[Person]
-  ```
+```
 
 W ten sposób utworzyliśmy instancję klasy ViewOf[Person]. Możemy dostać się do jej widoku (_.ui lub _.view) lub specjalnego handlera (_.value) który pozwala ustawić jaką konkretne instancje klasy person wyświetlać.
 
@@ -19,7 +19,7 @@ oczywiście musi istnieć gdzieś instrukcja jak z klasy Person utworzyć View. 
 
   ```scala
   def apply[T](implicit creator:CanBeViewOf[T], c: ActivityContext):ViewOf[T]
-  ```
+```
 
 oznacza to, że aby powyższa linia się skompilowała potrzebujemy dostarczyć CanBeViewOf[T], co możemy zrobić:
 - tworząc anonimowy obiekt dziedziczący po CanBeViewOf[T]: 
@@ -28,14 +28,16 @@ oznacza to, że aby powyższa linia się skompilowała potrzebujemy dostarczyć 
   implicit val `Person can be viewed` = new CanBeViewOf[Person] {
 	def createView(trig: AbstractReactiveVarible[T])(implicit c: ActivityContext): Ui[View] = 
 	w[TextView] <~ text("Hi")
-  } ```
+  } 
+```
   
 - tworząc instancje klasy AutoView[T]:
   
   ```scala
   implicit val `Person can be auto viewed` = new AutoView[Person] ( implicit c => implicit t => 
 		w[TextView] <~ react(p => text("Hi " + p.name))
-  ) ```
+  ) 
+```
   
 wytłumaczenia wymaga użyta metoda react(...). Pomaga ona w wiązani Tweaków z manipulatorami (np pozwala ustawić text widgetu tak by zawsze pokazywał imie osoby, nawet jeśli zmieni się ono w przyszłości). W sumie jest to jedna z najważniejszych właściwości biblioteki. 
 	
@@ -47,7 +49,8 @@ pozostaje zapytać gdzie mamy je utworzyć?
 	...
 	implicit val `can be viewed` = ...
 	...
-  } ```
+  } 
+```
 
 - w osobnym obiekcie np:
 
@@ -56,7 +59,8 @@ pozostaje zapytać gdzie mamy je utworzyć?
 	implicit val `person view` = AutoView[Person](...)
 	implicit val `book view` = AutoView[Person](...) 
 	...
-  } ```
+  } 
+```
 
 wtedy będziesz zmuszony zaimportować je w miejscu użycia ręcznie:
   import ViewBuilders._
@@ -78,31 +82,36 @@ praca z tablicami
 Jeśli poprawnie zdefiniujesz CanBeViewOf[Person] w prezencie otrzymasz implementacje CanBeViewOf[Array[Person]] która wykorzysta twoją implementacje, aby utworzyć ListView. Oznacza to, że jeśli możesz zrobić:
 
   ```scala
-  ViewOf[Person] ```
-  
+  ViewOf[Person]
+``` 
+
 to możesz również:
 
   ```scala
-  ViewOf[Array[Person]] ```
-
+  ViewOf[Array[Person]]
+```
 Praca z tablicami jest jednak nieco bardziej skomplikowana niż praca z pojedyńczymi elementami i przydałby się nam bogatszy interface niż ten klasyczny. Zamiast ViewOf[List[Person]] możesz użyć ListOf[Person]. ListOf ma znacznie bogatszy interface od ViewOf i pozwala np. na zaaktualizowanie pojedyńczej komurki zamiast całej tablicy.
 
------------------
+
 więcej zmiennych
 -----------------
 
 możesz również użyć konstrukcji dla dwuch typów np:
 
-	val view:ViewOf2 = ViewOf[Person, Style]
+  ```scala
+  val view:ViewOf2 = ViewOf[Person, Style]
+```
 
 klasa ViewOf2 posiada dwa manipulatory do zarządzania niezależnie lewą i prawą zmienną. Wymaga:
 	
-	implicit val `person with style can be viewed` = new CanBeViewOf2 { ... }
+  ```scala
+  implicit val `person with style can be viewed` = new CanBeViewOf2 { ... }
+```
 
 lub
-
-	implicit val `person with style can be auto viewed` = new AutoView2( (personRV, styleRV) => implicit c => ... )
-	
+  ```scala
+  implicit val `person with style can be auto viewed` = new AutoView2( (personRV, styleRV) => implicit c => ... )
+```
 ------------------
 a w przyszłości...
 ------------------
